@@ -14,3 +14,5 @@ build/
 *.egg-info/
 
 feature_backlog.txt
+
+.flaskenv

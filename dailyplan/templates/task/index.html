@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{{ url_date }}</h1>
+  {%  if g.user  %}
+  	<a href="{{ url_for('task.new') }}" class="action">Add Task</a>
+  {%  endif %}
+{% endblock %}
+
+{% block content %}
+	{% for task in tasks %}
+		<article class="task">
+			<header>
+				<div>
+					{% if g.user['id'] == task['user_id'] %}
+					<p class="task_text">{{ task['task_text'] }}</p>
+					{% endif %}
+				</div>
+					{% if g.user['id'] == task['user_id'] %}
+						<a class="fa-icon" href="{{ url_for('task.update', id=task['id'])}}" value="Edit"}><li class="fad fa-edit"></li></a>
+					{% endif %}
+			</header>
+		</article>
+		{% if not loop.last %}
+
+		{% endif %}
+	{% endfor %}
+{% endblock %}
