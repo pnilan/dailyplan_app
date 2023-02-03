@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{{ url_date }}</h1>
+<h1 class="date">
+<a href="/{{ prior_date }}"><i class="fa-solid fa-caret-left"></i></a>
+{{ date_text }}
+  <a href='/{{ next_date }}'><i class="fa-solid fa-caret-right"></i></a>
+  </h1>
   {%  if g.user  %}
   	<a href="{{ url_for('task.new') }}" class="action">Add Task</a>
   {%  endif %}
@@ -13,16 +17,22 @@
 			<header>
 				<div>
 					{% if g.user['id'] == task['user_id'] %}
-					<p class="task_text">{{ task['task_text'] }}</p>
-					{% endif %}
-				</div>
-					{% if g.user['id'] == task['user_id'] %}
-						<a class="fa-icon" href="{{ url_for('task.update', id=task['id'])}}" value="Edit"}><li class="fad fa-edit"></li></a>
+					<div>
+						<a class="fa icon" href="/" value="Complete"><i class="fa-icon fa-regular fa-square"></i></a>
+						<p class="task_text">{{ task['task_text'] }}</p>
+					</div>
+					<div>
+						<a class="fa-icon" href="{{ url_for('task.update', id=task['id'])}}" value="Edit"}><i class="fa-regular fa-pen-to-square"></i></a>
+						<form class="fa-regular fa-trash-can" action="{{ url_for('task.delete', id=task['id']) }}" method="post">
+							<input class="danger" type="submit" value="Delete" onclick="return confirm('Are you sure?');">
+						</form>
+					</div>
+					<p class='created'>Created: {{ task['created'] }}</p>
+					<hr>
+
 					{% endif %}
 			</header>
 		</article>
-		{% if not loop.last %}
 
-		{% endif %}
 	{% endfor %}
 {% endblock %}

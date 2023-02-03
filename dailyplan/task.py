@@ -14,16 +14,32 @@ bp = Blueprint('task', __name__)
 
 @bp.route('/')
 @login_required
-def index():
+def home():
+
+	url_date = date.today().strftime("%m%d%y")
+	return redirect(url_for('task.index', date=url_date))
+
+@bp.route('/<date>')
+@login_required
+def index(date):
 	db = get_db()
-	url_date = date_to_text(date.today().strftime('%m/%d/%Y'))
+
+	url_date = datetime.strptime(date, "%m%d%y").strftime("%Y-%m-%d")
+	prior_date = (datetime.strptime(date, "%m%d%y") - timedelta(days=1)).strftime("%m%d%y")
+	next_date = (datetime.strptime(date, "%m%d%y") + timedelta(days=1)).strftime("%m%d%y")
+
+	date_text = date_to_text(date, "%m%d%y")
+
+	date_ts = time.mktime(datetime.strptime(url_date, "%Y-%m-%d").timetuple())
+	date_nxt_ts = time.mktime((datetime.strptime(url_date, "%Y-%m-%d") + timedelta(days=1)).timetuple())
 	
 	tasks = db.execute(
-		'SELECT t.id, task_text, created, user_id, email'
+		'SELECT t.id, task_text, created, user_id, email, due_date'
 		' FROM task t JOIN user u ON t.user_id = u.id'
-		' ORDER by created DESC'
+		' WHERE date(created) = date(?)'
+		' ORDER by created DESC', (url_date,)
 	).fetchall()
-	return render_template('task/index.html', tasks=tasks, url_date=url_date)
+	return render_template('task/index.html', tasks=tasks, date_text=date_text, prior_date=prior_date, next_date=next_date)
 
 @bp.route('/new', methods=('GET', 'POST'))
 @login_required
@@ -45,7 +61,7 @@ def new():
 				(task_text, g.user['id'])
 			)
 			db.commit()
-			return redirect(url_for('task.index'))
+			return redirect(url_for('task.home'))
 
 	return	render_template('task/new.html')
 
@@ -89,7 +105,7 @@ def update(id):
 				(task_text, id)
 			)
 			db.commit()
-			return redirect(url_for('task.index'))
+			return redirect(url_for('task.home'))
 
 	return render_template('/task/update.html', task=task)
 
@@ -100,4 +116,4 @@ def delete(id):
 	db = get_db()
 	db.execute('DELETE FROM task WHERE id = ?', (id,))
 	db.commit()
-	return redirect(url_for('task.index'))
+	return redirect(url_for('task.home'))
