@@ -19,7 +19,7 @@ def home():
 	url_date = date.today().strftime("%m%d%y")
 	return redirect(url_for('task.index', date=url_date))
 
-@bp.route('/<date>')
+@bp.route('/day/<date>', methods=('GET', 'POST'))
 @login_required
 def index(date):
 	db = get_db()
@@ -34,7 +34,7 @@ def index(date):
 	date_nxt_ts = time.mktime((datetime.strptime(url_date, "%Y-%m-%d") + timedelta(days=1)).timetuple())
 	
 	tasks = db.execute(
-		'SELECT t.id, task_text, created, user_id, email, due_date'
+		'SELECT t.id, task_text, created, user_id, email, due_date, completed'
 		' FROM task t JOIN user u ON t.user_id = u.id'
 		' WHERE date(created) = date(?)'
 		' ORDER by created DESC', (url_date,)
@@ -63,12 +63,11 @@ def new():
 			db.commit()
 			return redirect(url_for('task.home'))
 
-	return	render_template('task/new.html')
 
 
-def get_task(id, check_user =True):
+def get_task(id, check_user=True):
 	task = get_db().execute(
-		'SELECT t.id, created, task_text, user_id, email'
+		'SELECT t.id, created, task_text, user_id, email, completed'
 		' FROM task t JOIN user u ON t.user_id = u.id'
 		' WHERE t.id = ?',
 		(id,)
@@ -87,8 +86,11 @@ def get_task(id, check_user =True):
 def update(id):
 	task = get_task(id)
 
+	print(task['id'])
+	print(type(task['id']))
+
 	if request.method == "POST":
-		task_text = request.form['task_text']
+		task_text = request.form['edit_task_' + str(task['id'])]
 		error = None
 
 		if not task_text:
@@ -107,7 +109,7 @@ def update(id):
 			db.commit()
 			return redirect(url_for('task.home'))
 
-	return render_template('/task/update.html', task=task)
+	# return render_template('/task/update.html', task=task)
 
 @bp.route('/<int:id>/delete', methods=('POST',))
 @login_required
@@ -117,3 +119,33 @@ def delete(id):
 	db.execute('DELETE FROM task WHERE id = ?', (id,))
 	db.commit()
 	return redirect(url_for('task.home'))
+
+@bp.route('/<int:id>/complete', methods=('POST',))
+@login_required
+def complete(id):
+	task = get_task(id)
+
+	if request.method == "POST":
+		db = get_db()
+		db.execute(
+			'UPDATE task SET completed = 1'
+			' WHERE id = ?',
+			(id,)
+		)
+		db.commit()
+		return redirect(url_for('task.home'))
+
+@bp.route('/<int:id>/incomplete', methods=('POST',))
+@login_required
+def undo(id):
+	task = get_task(id)
+
+	if request.method == "POST":
+		db = get_db()
+		db.execute(
+			'UPDATE task SET completed = 0'
+			' WHERE id = ?',
+			(id,)
+		)
+		db.commit()
+		return redirect(url_for('task.home'))

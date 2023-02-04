@@ -16,7 +16,7 @@ CREATE TABLE task (
 	user_id INTEGER NOT NULL,
 	created TIMESTAMP NOT NULL DEFAULT (datetime('now','localtime')),
 	task_text VARCHAR(128) NOT NULL,
-	completed BOOLEAN NOT NULL DEFAULT FALSE,
+	completed BOOLEAN NOT NULL DEFAULT 0,
 	due_date TIMESTAMP NOT NULL DEFAULT (datetime('now','localtime')),
 	FOREIGN KEY (user_id) REFERENCES user (id)
 );

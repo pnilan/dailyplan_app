@@ -1,38 +1,166 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h1 class="date">
-<a href="/{{ prior_date }}"><i class="fa-solid fa-caret-left"></i></a>
-{{ date_text }}
-  <a href='/{{ next_date }}'><i class="fa-solid fa-caret-right"></i></a>
-  </h1>
-  {%  if g.user  %}
-  	<a href="{{ url_for('task.new') }}" class="action">Add Task</a>
-  {%  endif %}
+
+<div class="container text-center">
+  <div class="row mt-4">
+  	<div class="col-2"></div>
+    <div class="col-1 my-auto text-muted">
+    	<a href="{{ prior_date }}" class="caret"><i class="fa-solid fa-caret-left"></i></a>
+    </div>
+    <div class="col-6 my-auto">
+    	<h1 class="mb-0">{{ date_text }}</h1>
+    </div>
+    <div class="col-1 caret my-auto text-muted">
+    	<a href='{{ next_date }}' class="caret"><i class="fa-solid fa-caret-right"></i></a>
+    </div>
+    <div class="col-2"></div>
+  </div>
+  <hr class="hr" />
+</div>
+
+
+
 {% endblock %}
 
 {% block content %}
-	{% for task in tasks %}
-		<article class="task">
-			<header>
-				<div>
-					{% if g.user['id'] == task['user_id'] %}
-					<div>
-						<a class="fa icon" href="/" value="Complete"><i class="fa-icon fa-regular fa-square"></i></a>
-						<p class="task_text">{{ task['task_text'] }}</p>
-					</div>
-					<div>
-						<a class="fa-icon" href="{{ url_for('task.update', id=task['id'])}}" value="Edit"}><i class="fa-regular fa-pen-to-square"></i></a>
-						<form class="fa-regular fa-trash-can" action="{{ url_for('task.delete', id=task['id']) }}" method="post">
-							<input class="danger" type="submit" value="Delete" onclick="return confirm('Are you sure?');">
+
+	<div class="container new-task-container">
+	<div class="">
+		<form action="{{ url_for('task.new') }}" method="post">
+			<div class="form-row">
+				<div class="col-2"></div>
+				<div class="col-8">
+					<label class="sr-only" for="task_text">Task Text</label>
+					<input type="text" class="form-control" id="task_text" name="task_text" placeholder="What's there to do?" value="{{ request.form['task_text'] }}" required>
+				</div>
+				<div class="col-1 text-center my-auto">
+					<button type="submit" value="Submit" class="btn btn-custom">
+						<span class="task_button text-muted">
+							<i class="fa-solid fa-circle-plus"></i>						
+						</span>
+					</button>
+				</div>
+				<div class="col-1"></div>			
+			</div>
+
+		</form>
+	</div>
+	
+		<hr class="hr-pre-task" />
+	</div>
+
+
+
+
+	<div class="container">
+	<!-- Task Loop -->
+		{% for task in tasks %}
+		<section class="task-container" >
+			<div class="row mb-1 mt-1">
+				<div class="col-1 my-auto text-center mb-0 text-muted">
+				
+					<!-- If task is complete, the checkbox will be checked, clicking it will uncheck box -->
+					{% if task['completed'] == True %}
+						
+						<form action="{{ url_for('task.undo', id=task['id']) }}" method='post'>
+							<button type='submit' value='complete' class='btn btn-custom'>
+								<span class="task_button text-muted">
+									<i class="fa-regular fa-square-check task_button"></i>
+								</span>
+							</button>
 						</form>
-					</div>
-					<p class='created'>Created: {{ task['created'] }}</p>
-					<hr>
+						<!-- If task is complete, the checkbox will be checked, clicking it will uncheck box -->
 
+					{% else %}
+
+						<!-- If task is incomplete, the checkbox will be unchecked, clicking it will check box -->
+						<form action="{{ url_for('task.complete', id=task['id']) }}" method='post'>
+							<button type='submit' value='incomplete' class='btn btn-custom'>
+								<span class="task_button text-muted">
+									<i class="fa-regular fa-square task_button"></i>
+								</span>
+							</button>
+						</form>
+						<!-- If task is incomplete, the checkbox will be unchecked, clicking it will check box -->
 					{% endif %}
-			</header>
-		</article>
 
-	{% endfor %}
+				</div>
+				<div class="col-9  my-auto">
+					{% if task['completed'] == True %}
+					<span style="text-decoration:line-through;">
+						<p class="task_text {{ task['id'] }} mb-0">
+						{{ task['task_text'] }}
+						</p>
+					</span>
+
+					{%  else %}
+						<p class="task_text {{ task['id'] }} mb-0">{{task['task_text'] }}</p>
+					{%  endif %}
+				</div>
+				<div class="col-1 my-auto text-center text-muted">
+
+
+					<button type="button" class="btn btn-custom" data-toggle="modal" data-target="#editmodal{{ task['id'] }}">
+					<span class="task_button text-muted">
+						<i class="fa-regular fa-pen-to-square task_button"></i>
+					</span>
+					</button>
+
+					<!-- Modal -->
+						<div class="modal fade" id="editmodal{{ task['id'] }}" tabindex="-1" role="dialog" aria-hidden="true">
+						  <div class="modal-dialog modal-dialog-centered" role="document">
+						    <div class="modal-content">
+						      <div class="modal-header">
+						        <h5 class="modal-title">Edit Task</h5>
+						        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						          <span aria-hidden="true">&times;</span>
+						        </button>
+						      </div>
+						      <form action="{{ url_for('task.update', id=task['id']) }}" method="post">
+						      <div class="modal-body">
+
+						          <div class="form-group">
+						            <label class="sr-only" for="edit_task_{{ task['id'] }}">Edit Task</label>
+						            <input type="text" name="edit_task_{{ task['id'] }}" id="edit_task_{{ task['id'] }}" class="form-control" value="{{ request.form['s'] or task['task_text'] }}" required>
+						          </div>
+						      </div>
+						      <div class="modal-footer">
+						        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						        <button type="submit" value="Save" class="btn btn-primary">Save changes</button>
+						      </div>
+									</form>
+						    </div>
+						  </div>
+						</div>
+
+
+
+					<!-- Modal -->
+
+
+				<!-- form action="{{ task['id'] }}" href="{{ url_for('task.update', id=task['id'])}}" method="post">
+						<button class="btn btn-secondary" type="submit" value="Edit"><i class="fa-regular fa-pen-to-square"></i></button>
+				</form -->
+				</div>
+				<div class="col-1 my-auto text-center text-muted">
+				
+
+					<form action="{{ url_for('task.delete', id=task['id']) }}" method="post">
+						<button type="submit" value="Delete" class="btn btn-custom">
+							<span class="task_button text-muted">
+								<i class="fa-solid fa-xmark task_button task_button_danger"></i>
+							</span>
+						</button>
+					</form>
+				</div>
+			</div>
+<hr/>
+		</section>
+		{% endfor %}		
+<!-- End Task Loop -->
+
+	</div>
+
+
 {% endblock %}
