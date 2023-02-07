@@ -5,6 +5,8 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
+import re
+
 from dailyplan.db import get_db
 
 # Creates blueprint 'auth' 
@@ -17,16 +19,41 @@ def signup():
         email = request.form['email']
         password = request.form['password']
         db = get_db()
-        error = None
+        error = []
+
+        
+
 
         if not name:
-            error = "Your name is required."
-        elif not email:
-            error = 'Email is required.'
-        elif not password:
-            error = 'Password is required.'
+            error.append("Your name is required.")
+        
+        if not email:
+            error.append('Email is required.')
+        
+        if not password:
+            error.append('Password is required.')
 
-        if error is None:
+        # No special characters in name, no leading spaces
+        name_pattern = re.compile("^\w+( \w+)*$")
+        name_validity = re.fullmatch(name_pattern, name)      
+    
+        if name_validity:
+            print("Valid name.")
+        else:
+            print("Invalid name.")
+            error.append("Name cannot contain special characters.")
+
+        # Min password requirements: 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
+        pw_pattern = re.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{8,}$")
+        pw_validity = re.search(pw_pattern, password)
+            
+        if pw_validity:
+            print("Password is valid.")
+        else:
+            print('Password is invalid.')
+            error.append("Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.")
+
+        if error == []:
             try:
                 db.execute(
                     "INSERT INTO user (name, email, password) VALUES (?, ?, ?)",
@@ -41,11 +68,12 @@ def signup():
                 session['user_id'] = user['id']
                 return redirect(url_for('index'))
             except db.IntegrityError:
-                error = f"Email {email} is already registered."
+                error = ["Email is already registered."]
             else:
                 return redirect(url_for("auth.login"))
 
-        flash(error)
+        for n in error:
+            flash(n)
 
     return render_template('auth/signup.html')
 
@@ -163,7 +191,7 @@ def settings():
             )
             db.commit()
         
-            return redirect(url_for('index'))
+            return redirect(request.referrer)
 
 
 

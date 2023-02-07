@@ -48,6 +48,7 @@ def index(date):
 @bp.route('/new', methods=('GET', 'POST'))
 @login_required
 def new():
+		
 	if request.method == 'POST':
 		task_text = request.form['task_text']
 		error = None
@@ -65,7 +66,8 @@ def new():
 				(task_text, g.user['id'])
 			)
 			db.commit()
-			return redirect(url_for('task.home'))
+			# return redirect(url_for('task.home'))
+			return redirect(request.referrer)
 
 
 
@@ -108,7 +110,8 @@ def update(id):
 				(task_text, id)
 			)
 			db.commit()
-			return redirect(url_for('task.home'))
+			# return redirect(url_for('task.home'))
+			return redirect(request.referrer)
 
 	# return render_template('/task/update.html', task=task)
 
@@ -119,7 +122,8 @@ def delete(id):
 	db = get_db()
 	db.execute('DELETE FROM task WHERE id = ?', (id,))
 	db.commit()
-	return redirect(url_for('task.home'))
+	# return redirect(url_for('task.home'))
+	return redirect(request.referrer)
 
 @bp.route('/<int:id>/complete', methods=('POST',))
 @login_required
@@ -134,7 +138,8 @@ def complete(id):
 			(id,)
 		)
 		db.commit()
-		return redirect(url_for('task.home'))
+		# return redirect(url_for('task.home'))
+		return redirect(request.referrer)
 
 @bp.route('/<int:id>/incomplete', methods=('POST',))
 @login_required
@@ -149,4 +154,5 @@ def undo(id):
 			(id,)
 		)
 		db.commit()
-		return redirect(url_for('task.home'))
+		# return redirect(url_for('task.home'))
+		return redirect(request.referrer)
