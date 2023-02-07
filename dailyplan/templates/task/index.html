@@ -17,6 +17,8 @@
     <div class="col-2"></div>
   </div>
   <hr class="hr" />
+
+
 </div>
 
 
@@ -24,7 +26,8 @@
 {% endblock %}
 
 {% block content %}
-
+	
+	<!-- New task form -->
 	<div class="container new-task-container">
 	<div class="">
 		<form action="{{ url_for('task.new') }}" method="post">
@@ -32,11 +35,11 @@
 				<div class="col-2"></div>
 				<div class="col-8">
 					<label class="sr-only" for="task_text">Task Text</label>
-					<input type="text" class="form-control" id="task_text" name="task_text" placeholder="What's there to do?" value="{{ request.form['task_text'] }}" required>
+					<input type="search" class="form-control" id="task_text" name="task_text" placeholder="What's there to do?" value="{{ request.form['task_text'] }}" required>
 				</div>
 				<div class="col-1 text-center my-auto">
 					<button type="submit" value="Submit" class="btn btn-custom">
-						<span class="task_button text-muted">
+						<span class="task_button">
 							<i class="fa-solid fa-circle-plus"></i>						
 						</span>
 					</button>
@@ -46,6 +49,7 @@
 
 		</form>
 	</div>
+	<!-- New task form end -->
 	
 		<hr class="hr-pre-task" />
 	</div>
@@ -56,6 +60,8 @@
 	<div class="container">
 	<!-- Task Loop -->
 		{% for task in tasks %}
+		{% if g.user['id'] == task['user_id'] %}
+
 		<section class="task-container" >
 			<div class="row mb-1 mt-1">
 				<div class="col-1 my-auto text-center mb-0 text-muted">
@@ -88,7 +94,7 @@
 				</div>
 				<div class="col-9  my-auto">
 					{% if task['completed'] == True %}
-					<span style="text-decoration:line-through;">
+					<span style="text-decoration:line-through;opacity:0.5;">
 						<p class="task_text {{ task['id'] }} mb-0">
 						{{ task['task_text'] }}
 						</p>
@@ -117,12 +123,13 @@
 						          <span aria-hidden="true">&times;</span>
 						        </button>
 						      </div>
-						      <form action="{{ url_for('task.update', id=task['id']) }}" method="post">
+						     
+						     <form action="{{ url_for('task.update', id=task['id']) }}" method="post">
 						      <div class="modal-body">
 
 						          <div class="form-group">
 						            <label class="sr-only" for="edit_task_{{ task['id'] }}">Edit Task</label>
-						            <input type="text" name="edit_task_{{ task['id'] }}" id="edit_task_{{ task['id'] }}" class="form-control" value="{{ request.form['s'] or task['task_text'] }}" required>
+						            <input type="search" name="edit_task_{{ task['id'] }}" id="edit_task_{{ task['id'] }}" class="form-control" value="{{ task['task_text'] }}" placeholder="{{ task['task_text'] }}" required>
 						          </div>
 						      </div>
 						      <div class="modal-footer">
@@ -133,6 +140,7 @@
 						    </div>
 						  </div>
 						</div>
+
 
 
 
@@ -157,6 +165,7 @@
 			</div>
 <hr/>
 		</section>
+		{% endif %}
 		{% endfor %}		
 <!-- End Task Loop -->
 

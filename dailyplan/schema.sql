@@ -8,7 +8,10 @@ CREATE TABLE user (
 	password VARCHAR(128) NOT NULL,
 	date_created TIMESTAMP DEFAULT (datetime('now','localtime')),
 	last_login TIMESTAMP,
-	timezone VARCHAR(40)
+	timezone VARCHAR(40),
+	dark_mode BOOLEAN DEFAUlT 0,
+	week_view BOOLEAN DEFAULT 0
+
 );
 
 CREATE TABLE task (

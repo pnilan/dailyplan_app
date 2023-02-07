@@ -1,6 +1,18 @@
+:root {
+  --outerspace: #4C5454;
+  --bittersweet: #FF715B;
+  --white: #FFFFFF;
+  --persiangreen: #1EA896;
+  --vandyke: #523F38;
+  --danger: #D10000;
+  --muted: #6c757d;
+  --innerspace: #707c7c;
+}
+
 body {
   font-family: 'Raleway', sans-serif;
-  color: #545454;
+  color: var(--outerspace);
+  background-color: var(--white);
 }
 .container {
   max-width: 1000px;
@@ -15,16 +27,73 @@ body {
 nav {
   border-bottom-left-radius: 0.3rem;
   border-bottom-right-radius: 0.3rem;
+  color: var(--white);
 }
+
+nav.bg-1 {
+  background-color: var(--outerspace);
+}
+
+nav.bg-2 {
+  background: linear-gradient(120deg, var(--bittersweet) 30%, var(--white) 250%);
+}
+
+.nav-links {
+  color: var(--white) !important;
+}
+
+.navbar-toggler {
+/*  color: var(--white) !important;*/
+  border: 0px;
+}
+
+.dropdown-item:active {
+  background-color: var(--persiangreen) !important;
+  color: var(--white);
+}
+
 
 form {
   margin-bottom: 0;
 }
 
-.caret {
-  color: #6c757d !important;
-    font-size: 3rem !important;
+a {
+  color: var(--outerspace);
+  transition: color 0.1s ease-in-out;
 }
+
+a:hover {
+  color: var(--vandyke);
+/*  text-decoration: none;*/
+  transition: color 0.1s ease-in-out;
+}
+
+.fa-circle {
+  color: var(--persiangreen) !important;
+}
+
+
+#task_text::-webkit-search-cancel-button {
+  position:relative;
+  right:0rem;  
+  color: var(--muted) !important;
+  opacity: 0.5;
+}
+
+.caret {
+  color: var(--bittersweet) !important;
+  opacity: 0.5;
+  font-size: 2rem !important;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.caret:hover {
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
+}
+
+
+/* New Task Section */
 
 .task-container {
   margin-top: 1rem;
@@ -35,18 +104,27 @@ form {
   margin-bottom: 0;
 }
 
+
+
+.fa-circle-plus {
+  font-size: 1.5rem;
+}
+
+
+
 .task_button {
+  color: var(--persiangreen);
   transition: color 0.25s ease-in-out;
 }
 
 .task_button:hover {
-  color: #505050;
+  color: var(--outerspace);
   cursor: pointer;
   transition: color 0.25s ease-in-out;
 }
 
 .task_button_danger:hover {
-  color: #D10000;
+  color: var(--danger);
   transition: color 0.25s ease-in-out;
 }
 
@@ -55,14 +133,12 @@ form {
   transition: color 0.25s ease-in-out;
 }
 .fa-brands:hover {
-  color: #505050;
+  color: var(--bittersweet);
   transition: color 0.25s ease-in-out;
 }
 
 .button-custom {
-/*  background-color: transparent !important;*/
   border: none;
-/*  color: white !important;*/
   padding: 0;
   margin: 0;
 }
@@ -80,6 +156,15 @@ input[type="text"][disabled] {
    background-color: transparent;
 }
 
+.edit_task::-webkit-search-cancel-button {
+  position:relative;
+  right:0rem;  
+/*  color: var(--muted) !important;*/
+  opacity: 0.5;
+}
+
+}
+
 textarea {
   border: none;
   display: inline;
@@ -88,4 +173,38 @@ textarea {
   padding: none;
   height: auto;
   width: 100%;
+}
+
+
+/*SIGNUP AND LOGIN PAGES*/
+
+.form-check-input {
+  position: relative !important;
+  margin-top: 0rem !important;
+  margin-right: 0.5rem !important;
+  margin-left: 0rem !important;
+}
+
+.btn-success {
+  background-color: var(--persiangreen);
+  border-color: var(--persiangreen);
+}
+
+.btn-success:hover {
+  background-color: var(--outerspace);
+  border-color: var(--outerspace);
+}
+
+.btn-primary {
+  background-color: var(--persiangreen) !important;
+  border-color: var(--persiangreen)!important;
+}
+
+
+.bg-image {
+  background-color: var(--white);
+}
+
+.landing-bg {
+ background-image: linear-gradient(120deg, var(--bittersweet) 30%, var(--white) 250%);
 }

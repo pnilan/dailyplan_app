@@ -1,15 +1,45 @@
 {% extends 'base.html' %}
 
-{% block header %}
-	<h1>{% block title %}Log In{% endblock %}</h1>
-{% endblock %}
-
 {% block content %}
-	<form action="" method="post">
-		<label for="email">Email:</label>
-		<input type="text" name="email" id="email" required>
-		<label for="password">Password:</label>
-		<input type="password" name="password" id="password" required>
-		<input type="submit" value="Log In">
-	</form>
+
+<section class="landing-bg">
+
+  <div class="mask d-flex align-items-center h-100 gradient-custom-3">
+    <div class="container h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+          <div class="card shadow" style="border-radius: 15px;">
+            <div class="card-body p-5">
+              <h2 class="text-uppercase text-center mb-5">Log in</h2>
+
+              <form action="" method="post">
+
+                <div class="form-outline mb-4">
+	                <label class="form-label" for="Email">Email</label>
+	                <input type="text" id="Email" name="email" class="form-control form-control-lg"/>
+                </div>
+
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="password">Password</label>
+                  <input type="password" id="password" name="password" class="form-control form-control-lg"/>
+                </div>
+
+                <div class="d-flex justify-content-center">
+                  <button type="submit" value="Submit"
+                    class="btn btn-success btn-block btn-lg gradient-custom-4">Log in</button>
+                </div>
+
+                <p class="text-center text-muted mt-5 mb-0">Need an account? <a href="{{ url_for('auth.signup') }}"
+                    class="fw-bold "><u>Sign up here</u></a></p>
+
+              </form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 {%  endblock %}
+

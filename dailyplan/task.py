@@ -36,7 +36,7 @@ def index(date):
 	tasks = db.execute(
 		'SELECT t.id, task_text, created, user_id, email, due_date, completed'
 		' FROM task t JOIN user u ON t.user_id = u.id'
-		' WHERE date(created) = date(?)'
+		' WHERE date(created) = date(?)' 
 		' ORDER by created DESC', (url_date,)
 	).fetchall()
 	return render_template('task/index.html', tasks=tasks, date_text=date_text, prior_date=prior_date, next_date=next_date)
@@ -85,9 +85,6 @@ def get_task(id, check_user=True):
 @login_required
 def update(id):
 	task = get_task(id)
-
-	print(task['id'])
-	print(type(task['id']))
 
 	if request.method == "POST":
 		task_text = request.form['edit_task_' + str(task['id'])]
