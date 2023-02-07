@@ -24,7 +24,11 @@ def home():
 def index(date):
 	db = get_db()
 
-	url_date = datetime.strptime(date, "%m%d%y").strftime("%Y-%m-%d")
+	try:
+		url_date = datetime.strptime(date, "%m%d%y").strftime("%Y-%m-%d")
+	except ValueError:
+		return redirect(url_for('task.home'))
+	
 	prior_date = (datetime.strptime(date, "%m%d%y") - timedelta(days=1)).strftime("%m%d%y")
 	next_date = (datetime.strptime(date, "%m%d%y") + timedelta(days=1)).strftime("%m%d%y")
 

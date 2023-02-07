@@ -208,3 +208,12 @@ textarea {
 .landing-bg {
  background-image: linear-gradient(120deg, var(--bittersweet) 30%, var(--white) 250%);
 }
+
+.page-404 {
+  margin-top: 20%;
+}
+
+.card-404 {
+  color: var(--white);
+  background-image: linear-gradient(120deg, var(--persiangreen) 30%, var(--white) 250%);
+}
