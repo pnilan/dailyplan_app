@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS task;
+DROP TABLE IF EXISTS subtask;
 
 CREATE TABLE user (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -20,6 +21,15 @@ CREATE TABLE task (
 	created TIMESTAMP NOT NULL DEFAULT (datetime('now','localtime')),
 	task_text VARCHAR(128) NOT NULL,
 	completed BOOLEAN NOT NULL DEFAULT 0,
-	due_date TIMESTAMP NOT NULL DEFAULT (datetime('now','localtime')),
+	due_date TEXT NOT NULL DEFAULT (date('now','localtime')),
 	FOREIGN KEY (user_id) REFERENCES user (id)
+);
+
+CREATE TABLE subtask (
+	id integer PRIMARY KEY AUTOINCREMENT,
+	created TIMESTAMP NOT NULL DEFAULT (datetime('now','localtime')),
+	task_text VARCHAR(128) NOT NULL,
+	completed BOOLEAN NOT NULL DEFAULT 0,
+	due_date TIMESTAMP NOT NULL DEFAULT (date('now','localtime')),
+	FOREIGN KEY (task_id) REFERENCES task (id)
 );
