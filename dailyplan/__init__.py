@@ -37,6 +37,9 @@ def create_app(test_config=None):
 	app.register_blueprint(task.bp)
 	app.add_url_rule('/', endpoint="index")
 
+	from . import subtask
+	app.register_blueprint(subtask.bp)
+
 	@app.errorhandler(404)
 	def not_found(e):
 		return render_template('404.html')

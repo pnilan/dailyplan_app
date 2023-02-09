@@ -5,6 +5,7 @@ from werkzeug.exceptions import abort
 
 from dailyplan.auth import login_required, get_user
 from dailyplan.db import get_db
+from dailyplan.subtask import new
 from dailyplan.date import date_to_text, add_suffix
 
 from datetime import date, datetime, timedelta
@@ -39,13 +40,21 @@ def index(date):
 	date_nxt_ts = time.mktime((datetime.strptime(url_date, "%Y-%m-%d") + timedelta(days=1)).timetuple())
 	
 	tasks = db.execute(
-		'SELECT t.id, task_text, t.created_at, user_id, email, due_date, completed'
+		'SELECT t.id, task_text, t.created_at, t.user_id, t.due_date, t.completed'
 		' FROM task t JOIN user u ON t.user_id = u.id'
 		' WHERE t.due_date = date(?) AND t.user_id = ?'
 		' ORDER by t.created_at ASC', (url_date, g.user['id'],)
 	).fetchall()
 
-	return render_template('task/index.html', tasks=tasks, date=date, date_text=date_text, prior_date=prior_date, next_date=next_date)
+	subtasks = db.execute(
+		'SELECT s.id, subtask_text, s.created_at, s.user_id, s.due_date, s.completed, task_id'
+		' FROM subtask s'
+		' JOIN user u ON s.user_id = u.id'
+		' JOIN task t ON t.id = s.task_id'
+		' WHERE u.id = ? AND s.due_date = date(?)', (g.user['id'], url_date,)
+	).fetchall()
+
+	return render_template('task/index.html', tasks=tasks, subtasks=subtasks, date=date, date_text=date_text, prior_date=prior_date, next_date=next_date)
 
 @bp.route('/new/<date>', methods=('GET', 'POST'))
 @login_required
@@ -74,10 +83,9 @@ def new(date):
 			return redirect(request.referrer)
 
 
-
 def get_task(id, check_user=True):
 	task = get_db().execute(
-		'SELECT t.id, t.created_at, task_text, user_id, email, completed'
+		'SELECT t.id, t.created_at, task_text, t.user_id, t.completed, t.completed_at, t.due_date'
 		' FROM task t JOIN user u ON t.user_id = u.id'
 		' WHERE t.id = ?',
 		(id,)
@@ -120,11 +128,22 @@ def update(id):
 @login_required
 def delete(id):
 	get_task(id)
-	db = get_db()
-	db.execute('DELETE FROM task WHERE id = ?', (id,))
-	db.commit()
-	# return redirect(url_for('task.home'))
-	return redirect(request.referrer)
+	subtasks = get_subtasks(id)
+
+	if request.method == "POST":
+		db = get_db()
+		db.execute('DELETE FROM task WHERE id = ?', (id,))
+
+		if subtasks is None:
+			pass
+		else:
+			db.execute(
+				'DELETE FROM subtask WHERE task_id = ?', (id,)
+			)
+
+		db.commit()
+
+		return redirect(request.referrer)
 
 @bp.route('/<int:id>/complete', methods=('POST',))
 @login_required
@@ -134,7 +153,7 @@ def complete(id):
 	if request.method == "POST":
 		db = get_db()
 		db.execute(
-			'UPDATE task SET completed = 1'
+			'UPDATE task SET completed = 1, completed_at = datetime("now", "localtime")'
 			' WHERE id = ?',
 			(id,)
 		)
@@ -150,9 +169,57 @@ def undo(id):
 	if request.method == "POST":
 		db = get_db()
 		db.execute(
-			'UPDATE task SET completed = 0'
+			'UPDATE task SET completed = 0, completed_at = NULL'
 			' WHERE id = ?',
 			(id,)
 		)
 		db.commit()
 		return redirect(request.referrer)
+
+# Get all subtasks for task x
+def get_subtasks(id, check_user=True):
+	db = get_db()
+	
+	subtasks = db.execute(
+		'SELECT s.id, subtask_text, s.created_at, s.user_id, s.due_date, s.completed, task_id'
+		' FROM subtask s'
+		' JOIN user u ON s.user_id = u.id'
+		' JOIN task t ON t.id = s.task_id'
+		' WHERE u.id = ? AND task_id = ?', (g.user['id'], id,)
+	).fetchall()
+
+	return subtasks
+
+
+# Move/Copy to next day
+# Should this be a "copy to next day", "move completely to next day", or, only move open items to next day?
+@bp.route('/<date>/<int:id>/move', methods=('POST',))
+@login_required
+def move_to_next_day(id, date):
+	task = get_task(id)
+	subtasks = get_subtasks(id)
+
+	if request.method == "POST":
+		db = get_db()
+		db.execute(
+			'UPDATE task SET due_date = date(due_date, "+1 day"), completed = 0, completed_at = NULL'
+			' WHERE id = ?', (id,)
+		)
+
+		if subtasks is None:
+			pass
+		else:
+			db.execute(
+				'UPDATE subtask SET due_date = date(due_date, "+1 day")'
+				' WHERE task_id = ?', (id,)
+			)
+		db.commit()
+
+		return redirect(request.referrer)
+		flash('Task moved to next day.')
+
+
+
+
+
+

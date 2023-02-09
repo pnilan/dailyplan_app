@@ -55,15 +55,15 @@
 
 		<section class="task-container" >
 			<div class="row mb-1 mt-1">
-				<div class="col-1 my-auto text-center mb-0 text-muted">
+				<div class="col-1 my-auto text-center mb-0">
 				
 					<!-- If task is complete, the checkbox will be checked, clicking it will uncheck box -->
 					{% if task['completed'] == True %}
 						
 						<form action="{{ url_for('task.undo', id=task['id']) }}" method='post'>
 							<button type='submit' value='complete' class='btn btn-custom'>
-								<span class="task_button text-muted">
-									<i class="fa-regular fa-square-check task_button"></i>
+								<span class="text-muted">
+									<i class="fa-regular fa-square-check task_button_completed"></i>
 								</span>
 							</button>
 						</form>
@@ -94,11 +94,13 @@
 					{%  else %}
 						<p class="task_text {{ task['id'] }} mb-0">{{task['task_text'] }}</p>
 					{%  endif %}
+
+
 				</div>
 
 				<div class="col-2 my-auto text-center text-muted">
 				<div class="btn-group">
-					<button type="button" class="btn btn-custom" data-toggle="" data-target="">
+					<button type="button" class="btn btn-custom" id="toggle-subtask-{{ task['id'] }}" data-toggle="" data-target="">
 						<span class="task_button text-muted">
 							<i class="fa-solid fa-diagram-successor task_button"></i>
 						</span>
@@ -144,6 +146,15 @@
 								<i class="fa-regular fa-pen-to-square"></i>
 							</span>
 						{% endif %}
+						</form>
+
+						<form action="{{ url_for('task.move_to_next_day', id=task['id'], date=date) }}" method="post">
+							<button type="submit" value="Delete" class="btn btn-custom">
+								<span class="task_button text-muted">
+									<i class="fa-solid fa-right-to-bracket task_button"></i>
+								</span>
+							</button>
+						</form>
 
 						<form action="{{ url_for('task.delete', id=task['id']) }}" method="post">
 							<button type="submit" value="Delete" class="btn btn-custom">
@@ -152,26 +163,120 @@
 								</span>
 							</button>
 						</form>
-				</div>
-					
-
-
-
-
-
-
-
-				</div>
-
+				  </div>
+			  </div>
 			</div>
-<hr/>
+
+
+
+        <!-- Subtask loop here -->
+      <div class="task-container">
+
+        {% for subtask in subtasks %}
+          {% if subtask['task_id'] == task['id'] %}
+
+        <div class="row">
+          <div class="col-2 my-auto text-right mb-0">
+          
+            <!-- If subtask is complete, the checkbox will be checked, clicking it will uncheck box -->
+            {% if subtask['completed'] == True %}
+              
+              <form action="{{ url_for('subtask.undo', id=subtask['id']) }}" method='post'>
+                <button type='submit' value='complete' class='btn btn-custom' style="">
+                  <span class="text-muted">
+                    <i class="fa-regular fa-square-check task_button_completed"></i>
+                  </span>
+                </button>
+              </form>
+              <!-- If subtask is complete, the checkbox will be checked, clicking it will uncheck box -->
+
+            {% else %}
+
+              <!-- If subtask is incomplete, the checkbox will be unchecked, clicking it will check box -->
+              <form action="{{ url_for('subtask.complete', id=subtask['id']) }}" method='post'>
+                <button type='submit' value='incomplete' class='btn btn-custom'>
+                  <span class="text-muted">
+                    <i class="fa-regular fa-square task_button"></i>
+                  </span>
+                </button>
+              </form>
+              <!-- If subtask is incomplete, the checkbox will be unchecked, clicking it will check box -->
+            {% endif %}
+
+          </div>
+          <div class="col my-auto">
+            {% if subtask['completed'] == True %}
+            <span style="text-decoration:line-through;opacity:0.5;">
+              <p class="subtask {{ subtask['id'] }} mb-0">
+              {{ subtask['subtask_text'] }}
+              </p>
+            </span>
+
+            {%  else %}
+              <p class="subtask_text {{ task['id'] }} mb-0">{{subtask['subtask_text'] }}</p>
+            {%  endif %}
+
+
+          </div>
+
+          <div class="col-1 my-auto text-center text-muted">
+
+              <form action="{{ url_for('subtask.delete', id=subtask['id']) }}" method="post">
+                <button type="submit" value="Delete" class="btn btn-custom">
+                  <span class="task_button text-muted">
+                    <i class="fa-solid fa-xmark task_button task_button_danger"></i>
+                  </span>
+                </button>
+              </form>
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}       
+      
+      </div>  
+
+
+        <!-- End Subtask Loop -->
+
+        <!-- New subtask form -->
+
+        <script>
+        $(document).ready(function(){
+            $('#toggle-subtask-{{ task["id"] }}').click(function() {
+              $('#toggle-row-{{ task["id"] }}').toggle();
+            });
+        });
+        </script>
+
+        <div class="container" id='toggle-row-{{ task["id"] }}' style="display:none;">
+          <form action="{{ url_for('subtask.new', date=date, task_id=task['id']) }}" method="post">
+            <div class="form-row">
+              <div class="col-2"></div>
+              <div class="col-8">
+                <label class="sr-only" for="subtask_text">Subtask Text</label>
+                <input type="search" class="form-control" id="subtask_text" name="subtask_text" placeholder="Add subtask" value="{{ request.form['subtask_text'] }}" required>
+              </div>
+              <div class="col-1 text-center my-auto">
+                <button type="submit" value="Submit" class="btn btn-custom">
+                  <span class="task_button">
+                    <i class="fa-solid fa-plus"></i>           
+                  </span>
+                </button>
+              </div>
+              <div class="col-1"></div>     
+            </div>
+
+          </form>
+          </div>
+        <!-- End new subtask form -->
+
+      <hr/>
 		</section>
 		{% endfor %}		
 <!-- End Task Loop -->
 
 <!-- New task form -->
-<div class="container new-task-container">
-<div class="">
+<div class="container">
 	<form action="{{ url_for('task.new', date=date) }}" method="post">
 		<div class="form-row">
 			<div class="col-2"></div>
@@ -190,11 +295,8 @@
 		</div>
 
 	</form>
-</div>
+  </div>
 <!-- New task form end -->
-
-	<!-- hr class="hr-pre-task" / -->
-</div>
 
 	</div>
 

@@ -134,10 +134,18 @@ a:hover {
   transition: color 0.25s ease-in-out;
 }
 
-
-
 .task_button_danger:hover {
   color: var(--danger);
+  transition: color 0.25s ease-in-out;
+}
+
+.task_button_completed {
+  color: var(--lightgrey);
+}
+
+.task_button_completed:hover {
+  color: var(--persiangreen);
+  cursor: pointer;
   transition: color 0.25s ease-in-out;
 }
 

@@ -29,7 +29,7 @@ CREATE TABLE subtask (
 	id integer PRIMARY KEY AUTOINCREMENT,
 	user_id INTEGER NOT NULL,
 	task_id INTEGER NOT NULL,
-	created TIMESTAMP NOT NULL DEFAULT (datetime('now','localtime')),
+	created_at TIMESTAMP NOT NULL DEFAULT (datetime('now','localtime')),
 	subtask_text VARCHAR(128) NOT NULL,
 	completed BOOLEAN NOT NULL DEFAULT 0,
 	completed_at TIMESTAMP,
