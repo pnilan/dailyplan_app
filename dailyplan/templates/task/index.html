@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+
+
 {% block header %}
 
 <div class="container text-center">
@@ -16,7 +18,7 @@
     </div>
     <div class="col-2"></div>
   </div>
-  <hr class="hr" />
+  <hr class="hr" style="margin-bottom:0;"/>
 
 
 </div>
@@ -27,40 +29,29 @@
 
 {% block content %}
 	
-	<!-- New task form -->
-	<div class="container new-task-container">
-	<div class="">
-		<form action="{{ url_for('task.new') }}" method="post">
-			<div class="form-row">
-				<div class="col-2"></div>
-				<div class="col-8">
-					<label class="sr-only" for="task_text">Task Text</label>
-					<input type="search" class="form-control" id="task_text" name="task_text" placeholder="What's there to do?" value="{{ request.form['task_text'] }}" required>
-				</div>
-				<div class="col-1 text-center my-auto">
-					<button type="submit" value="Submit" class="btn btn-custom">
-						<span class="task_button">
-							<i class="fa-solid fa-circle-plus"></i>						
-						</span>
-					</button>
-				</div>
-				<div class="col-1"></div>			
-			</div>
 
-		</form>
-	</div>
-	<!-- New task form end -->
-	
-		<hr class="hr-pre-task" />
-	</div>
 
 
 
 
 	<div class="container">
 	<!-- Task Loop -->
+		{%  if tasks == [] %}
+			<div class="task-container">
+				<div class="row my-auto text-center text-muted">
+				<div class="col"></div>
+					<div class="col-3 empty-border">
+						<h5>Nothing here yet.</h5>
+						<h6>Add something to do below!</h6>
+					</div>
+					<div class="col"></div>
+				</div>
+			</div>
+
+			<hr style="margin-top:0;">
+		{% endif %}
+
 		{% for task in tasks %}
-		{% if g.user['id'] == task['user_id'] %}
 
 		<section class="task-container" >
 			<div class="row mb-1 mt-1">
@@ -92,7 +83,7 @@
 					{% endif %}
 
 				</div>
-				<div class="col-9  my-auto">
+				<div class="col my-auto">
 					{% if task['completed'] == True %}
 					<span style="text-decoration:line-through;opacity:0.5;">
 						<p class="task_text {{ task['id'] }} mb-0">
@@ -104,70 +95,106 @@
 						<p class="task_text {{ task['id'] }} mb-0">{{task['task_text'] }}</p>
 					{%  endif %}
 				</div>
-				<div class="col-1 my-auto text-center text-muted">
 
-
-					<button type="button" class="btn btn-custom" data-toggle="modal" data-target="#editmodal{{ task['id'] }}">
-					<span class="task_button text-muted">
-						<i class="fa-regular fa-pen-to-square task_button"></i>
-					</span>
+				<div class="col-2 my-auto text-center text-muted">
+				<div class="btn-group">
+					<button type="button" class="btn btn-custom" data-toggle="" data-target="">
+						<span class="task_button text-muted">
+							<i class="fa-solid fa-diagram-successor task_button"></i>
+						</span>
 					</button>
 
-					<!-- Modal -->
-						<div class="modal fade" id="editmodal{{ task['id'] }}" tabindex="-1" role="dialog" aria-hidden="true">
-						  <div class="modal-dialog modal-dialog-centered" role="document">
-						    <div class="modal-content">
-						      <div class="modal-header">
-						        <h5 class="modal-title">Edit Task</h5>
-						        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						          <span aria-hidden="true">&times;</span>
-						        </button>
-						      </div>
-						     
-						     <form action="{{ url_for('task.update', id=task['id']) }}" method="post">
-						      <div class="modal-body">
-
-						          <div class="form-group">
-						            <label class="sr-only" for="edit_task_{{ task['id'] }}">Edit Task</label>
-						            <input type="search" name="edit_task_{{ task['id'] }}" id="edit_task_{{ task['id'] }}" class="form-control" value="{{ task['task_text'] }}" placeholder="{{ task['task_text'] }}" required>
-						          </div>
-						      </div>
-						      <div class="modal-footer">
-						        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-						        <button type="submit" value="Save" class="btn btn-primary">Save changes</button>
-						      </div>
-									</form>
-						    </div>
-						  </div>
-						</div>
-
-
-
-
-					<!-- Modal -->
-
-
-				<!-- form action="{{ task['id'] }}" href="{{ url_for('task.update', id=task['id'])}}" method="post">
-						<button class="btn btn-secondary" type="submit" value="Edit"><i class="fa-regular fa-pen-to-square"></i></button>
-				</form -->
-				</div>
-				<div class="col-1 my-auto text-center text-muted">
-				
-
-					<form action="{{ url_for('task.delete', id=task['id']) }}" method="post">
-						<button type="submit" value="Delete" class="btn btn-custom">
-							<span class="task_button text-muted">
-								<i class="fa-solid fa-xmark task_button task_button_danger"></i>
-							</span>
+					{% if task['completed'] == False %}
+						<button type="button" class="btn btn-custom" data-toggle="modal" data-target="#editmodal{{ task['id'] }}">
+						<span class="task_button text-muted">
+							<i class="fa-regular fa-pen-to-square task_button"></i>
+						</span>
 						</button>
-					</form>
+
+						<!-- Modal -->
+							<div class="modal fade" id="editmodal{{ task['id'] }}" tabindex="-1" role="dialog" aria-hidden="true">
+							  <div class="modal-dialog modal-dialog-centered" role="document">
+							    <div class="modal-content">
+							      <div class="modal-header">
+							        <h5 class="modal-title">Edit Task</h5>
+							        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							          <span aria-hidden="true">&times;</span>
+							        </button>
+							      </div>
+							     
+							     <form action="{{ url_for('task.update', id=task['id']) }}" method="post">
+							      <div class="modal-body">
+
+							          <div class="form-group">
+							            <label class="sr-only" for="edit_task_{{ task['id'] }}">Edit Task</label>
+							            <input type="search" name="edit_task_{{ task['id'] }}" id="edit_task_{{ task['id'] }}" class="form-control" value="{{ task['task_text'] }}" placeholder="{{ task['task_text'] }}" required>
+							          </div>
+							      </div>
+							      <div class="modal-footer">
+							        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+							        <button type="submit" value="Save" class="btn btn-primary">Save changes</button>
+							      </div>
+										</form>
+							    </div>
+							  </div>
+							</div>
+
+						{% else %}
+							<span class="btn task_button_disabled">
+								<i class="fa-regular fa-pen-to-square"></i>
+							</span>
+						{% endif %}
+
+						<form action="{{ url_for('task.delete', id=task['id']) }}" method="post">
+							<button type="submit" value="Delete" class="btn btn-custom">
+								<span class="task_button text-muted">
+									<i class="fa-solid fa-xmark task_button task_button_danger"></i>
+								</span>
+							</button>
+						</form>
 				</div>
+					
+
+
+
+
+
+
+
+				</div>
+
 			</div>
 <hr/>
 		</section>
-		{% endif %}
 		{% endfor %}		
 <!-- End Task Loop -->
+
+<!-- New task form -->
+<div class="container new-task-container">
+<div class="">
+	<form action="{{ url_for('task.new', date=date) }}" method="post">
+		<div class="form-row">
+			<div class="col-2"></div>
+			<div class="col-8">
+				<label class="sr-only" for="task_text">Task Text</label>
+				<input type="search" class="form-control" id="task_text" name="task_text" placeholder="What's there to do?" value="{{ request.form['task_text'] }}" autofocus="autofocus" required>
+			</div>
+			<div class="col-1 text-center my-auto">
+				<button type="submit" value="Submit" class="btn btn-custom">
+					<span class="task_button">
+						<i class="fa-solid fa-circle-plus"></i>						
+					</span>
+				</button>
+			</div>
+			<div class="col-1"></div>			
+		</div>
+
+	</form>
+</div>
+<!-- New task form end -->
+
+	<!-- hr class="hr-pre-task" / -->
+</div>
 
 	</div>
 

@@ -1,14 +1,15 @@
 from flask import (
-	Blueprint, flash, g, redirect, render_template, request, url_for
+	Blueprint, flash, g, redirect, render_template, request, url_for, session
 )
 from werkzeug.exceptions import abort
 
-from dailyplan.auth import login_required
+from dailyplan.auth import login_required, get_user
 from dailyplan.db import get_db
 from dailyplan.date import date_to_text, add_suffix
 
 from datetime import date, datetime, timedelta
 import time
+import re
 
 bp = Blueprint('task', __name__)
 
@@ -28,7 +29,7 @@ def index(date):
 		url_date = datetime.strptime(date, "%m%d%y").strftime("%Y-%m-%d")
 	except ValueError:
 		return redirect(url_for('task.home'))
-	
+
 	prior_date = (datetime.strptime(date, "%m%d%y") - timedelta(days=1)).strftime("%m%d%y")
 	next_date = (datetime.strptime(date, "%m%d%y") + timedelta(days=1)).strftime("%m%d%y")
 
@@ -38,17 +39,20 @@ def index(date):
 	date_nxt_ts = time.mktime((datetime.strptime(url_date, "%Y-%m-%d") + timedelta(days=1)).timetuple())
 	
 	tasks = db.execute(
-		'SELECT t.id, task_text, created, user_id, email, due_date, completed'
+		'SELECT t.id, task_text, t.created_at, user_id, email, due_date, completed'
 		' FROM task t JOIN user u ON t.user_id = u.id'
-		' WHERE date(created) = date(?)' 
-		' ORDER by created DESC', (url_date,)
+		' WHERE t.due_date = date(?) AND t.user_id = ?'
+		' ORDER by t.created_at ASC', (url_date, g.user['id'],)
 	).fetchall()
-	return render_template('task/index.html', tasks=tasks, date_text=date_text, prior_date=prior_date, next_date=next_date)
 
-@bp.route('/new', methods=('GET', 'POST'))
+	return render_template('task/index.html', tasks=tasks, date=date, date_text=date_text, prior_date=prior_date, next_date=next_date)
+
+@bp.route('/new/<date>', methods=('GET', 'POST'))
 @login_required
-def new():
-		
+def new(date):
+
+	due_date = datetime.strptime(date, "%m%d%y").strftime("%Y-%m-%d")
+
 	if request.method == 'POST':
 		task_text = request.form['task_text']
 		error = None
@@ -61,19 +65,19 @@ def new():
 		else:
 			db = get_db()
 			db.execute(
-				'INSERT INTO task (task_text, user_id)'
-				' VALUES (?, ?)',
-				(task_text, g.user['id'])
+				'INSERT INTO task (task_text, user_id, due_date)'
+				' VALUES (?, ?, ?)',
+				(task_text, g.user['id'], due_date,)
 			)
 			db.commit()
-			# return redirect(url_for('task.home'))
+
 			return redirect(request.referrer)
 
 
 
 def get_task(id, check_user=True):
 	task = get_db().execute(
-		'SELECT t.id, created, task_text, user_id, email, completed'
+		'SELECT t.id, t.created_at, task_text, user_id, email, completed'
 		' FROM task t JOIN user u ON t.user_id = u.id'
 		' WHERE t.id = ?',
 		(id,)
@@ -110,10 +114,7 @@ def update(id):
 				(task_text, id)
 			)
 			db.commit()
-			# return redirect(url_for('task.home'))
 			return redirect(request.referrer)
-
-	# return render_template('/task/update.html', task=task)
 
 @bp.route('/<int:id>/delete', methods=('POST',))
 @login_required
@@ -154,5 +155,4 @@ def undo(id):
 			(id,)
 		)
 		db.commit()
-		# return redirect(url_for('task.home'))
 		return redirect(request.referrer)
