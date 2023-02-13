@@ -17,4 +17,4 @@ feature_backlog.txt
 
 .flaskenv
 
-.env
+.env.DS_Store
