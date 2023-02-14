@@ -40,3 +40,6 @@ def create_app(test_config=None):
 		return render_template('404.html')
 
 	return app
+
+if __name__ == '__main__':
+	app.run()
