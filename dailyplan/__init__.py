@@ -39,4 +39,8 @@ def create_app(test_config=None):
 	def not_found(e):
 		return render_template('404.html')
 
+	@app.errorhandler(403)
+	def not_found(e):
+		return render_template('404.html')	
+
 	return app
