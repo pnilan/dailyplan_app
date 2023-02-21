@@ -10,10 +10,15 @@
   --lightgrey: #939ba2;
 }
 
+html {
+  height: 100%;
+}
+
 body {
   font-family: 'Raleway', sans-serif;
   color: var(--outerspace);
   background-color: var(--white);
+  min-height: 100%;
 }
 .container {
   max-width: 1000px;
@@ -24,6 +29,8 @@ body {
   margin-top: 0rem;
   margin-bottom: 0rem;
 }
+
+
 
 nav {
   border-bottom-left-radius: 0.3rem;
@@ -51,6 +58,15 @@ nav.bg-2 {
 .dropdown-item:active {
   background-color: var(--persiangreen) !important;
   color: var(--white);
+}
+
+.page {
+  min-height: 80%;
+  margin-bottom:1rem;
+}
+
+footer {
+  height: 3rem;
 }
 
 
