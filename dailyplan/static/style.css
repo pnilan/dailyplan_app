@@ -274,6 +274,32 @@ textarea {
   color: var(--white);
 }
 
+.card-contact {
+  max-width: 100%;
+  border-radius: 2rem;
+  background-image: linear-gradient(170deg, var(--persiangreen) 30%, var(--white) 300%);
+  color: var(--white);
+}
+
+.btn-contact {
+  background-color: var(--persiangreen);
+  border-color: var(--persiangreen);
+  color: var(--white);
+
+}
+
+.btn-contact:hover {
+  background-color: var(--bittersweet);
+  border-color: var(--bittersweet);
+}
+
+.email-success {
+  background-color: var(--lightgrey);
+  color: var(--white);
+  padding: 0;
+  border-radius: 1rem;
+}
+
 .hr-card {
   margin-top: 0;
   margin-bottom: 1rem;

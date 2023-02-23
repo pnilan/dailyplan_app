@@ -1,5 +1,8 @@
 import os
 from flask import Flask, render_template
+from flask_mail import Mail
+
+mail = Mail()
 
 def create_app(test_config=None):
 	# create and configure the app
@@ -22,6 +25,15 @@ def create_app(test_config=None):
 	except OSError:
 		pass
 
+
+	app.config['MAIL_SERVER']='smtp.gmail.com'
+	app.config['MAIL_PORT'] = 465
+	app.config["MAIL_USE_SSL"] = True
+	app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+	app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+	app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
+	mail.init_app(app)
+
 	from . import db
 	db.init_app(app)
 
@@ -37,6 +49,9 @@ def create_app(test_config=None):
 
 	from . import insights
 	app.register_blueprint(insights.bp)
+
+	from . import aux
+	app.register_blueprint(aux.bp)
 
 	@app.errorhandler(404)
 	def not_found(e):

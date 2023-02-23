@@ -1,4 +1,4 @@
-from dailyplan import create_app
+from dailyplan import create_app, mail
 from dotenv import load_dotenv
 
 load_dotenv('.env')
