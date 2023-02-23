@@ -33,7 +33,7 @@ def new(date, task_id):
 	due_date = datetime.strptime(date, "%m%d%y").strftime("%Y-%m-%d")
 
 	if request.method == 'POST':
-		subtask_text = request.form['subtask_text']
+		subtask_text = request.form['subtask_text_' + str(task_id)]
 		error = None
 
 		if not subtask_text:
