@@ -130,7 +130,7 @@ def insights():
 	tasks_completed = total_tasks_completed()
 	subtasks_created = total_subtasks_created()
 	subtasks_completed = total_subtasks_completed()
-	sum_tasks = tasks_created + tasks_completed
+	sum_tasks = tasks_created + subtasks_created
 	sum_tasks_completed = tasks_completed + subtasks_completed
 	average_time, median_time, avg_time_unit, med_time_unit = task_time_completion()
 
