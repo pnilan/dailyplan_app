@@ -35,6 +35,9 @@ def create_app(test_config=None):
 	from . import subtask
 	app.register_blueprint(subtask.bp)
 
+	from . import insights
+	app.register_blueprint(insights.bp)
+
 	@app.errorhandler(404)
 	def not_found(e):
 		return render_template('404.html')

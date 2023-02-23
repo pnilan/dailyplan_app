@@ -274,3 +274,18 @@ textarea {
 .empty-border {
   padding: 1rem;
 }
+
+.card-insights {
+  border-radius: 2rem;
+  background-image: linear-gradient(170deg, var(--persiangreen) 30%, var(--white) 300%);
+  color: var(--white);
+}
+
+.hr-card {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  border: none;
+  height: 1px;
+  background: -webkit-gradient(linear, 0 0, 100% 0, from(transparent), to(transparent), color-stop(50%, white));
+  opacity: 0.15;
+}

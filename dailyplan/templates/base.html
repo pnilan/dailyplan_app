@@ -53,7 +53,7 @@
 		        		<a class="nav-link dropdown-toggle nav-links" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ g.user['name'] }}</a>
 		        		<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 		          		<a class="dropdown-item" href="#usersettings" data-toggle="modal" data-target="#user_settings_modal">Settings</a>
-		          		<a class="dropdown-item" href="#">Insights</a>
+		          		<a class="dropdown-item" href="{{ url_for('insights.insights') }}">Insights</a>
 		          		<div class="dropdown-divider"></div>
 		          		<a class="dropdown-item" href="{{ url_for('auth.logout') }}">Sign out</a>
 		         		</div>
