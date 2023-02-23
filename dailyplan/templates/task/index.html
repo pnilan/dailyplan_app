@@ -55,7 +55,7 @@
 
 		<section class="task-container" >
 			<div class="row mb-1 mt-1">
-				<div class="col-1 my-auto text-center mb-0">
+				<div class="col-2 my-auto text-center mb-0">
 				
 					<!-- If task is complete, the checkbox will be checked, clicking it will uncheck box -->
 					{% if task['completed'] == True %}
@@ -83,7 +83,7 @@
 					{% endif %}
 
 				</div>
-				<div class="col my-auto">
+				<div class="col-7 my-auto" id="toggle-subtask-{{ task['id'] }}" data-toggle="" data-target="">
 					{% if task['completed'] == True %}
 					<span style="text-decoration:line-through;opacity:0.5;">
 						<p class="task_text {{ task['id'] }} mb-0">
@@ -98,13 +98,8 @@
 
 				</div>
 
-				<div class="col-2 my-auto text-center text-muted">
+				<div class="col-3 my-auto text-center text-muted">
 				<div class="btn-group">
-					<button type="button" class="btn btn-custom" id="toggle-subtask-{{ task['id'] }}" data-toggle="" data-target="">
-						<span class="task_button text-muted">
-							<i class="fa-solid fa-diagram-successor task_button"></i>
-						</span>
-					</button>
 
 					{% if task['completed'] == False %}
 						<button type="button" class="btn btn-custom" data-toggle="modal" data-target="#editmodal{{ task['id'] }}">
@@ -204,7 +199,7 @@
             {% endif %}
 
           </div>
-          <div class="col my-auto">
+          <div class="col-8 my-auto">
             {% if subtask['completed'] == True %}
             <span style="text-decoration:line-through;opacity:0.5;">
               <p class="subtask {{ subtask['id'] }} mb-0">
@@ -219,7 +214,7 @@
 
           </div>
 
-          <div class="col-1 my-auto text-center text-muted">
+          <div class="col-2 my-auto text-center text-muted">
 
               <form action="{{ url_for('subtask.delete', id=subtask['id']) }}" method="post">
                 <button type="submit" value="Delete" class="btn btn-custom">
@@ -242,8 +237,9 @@
 
         <script>
         $(document).ready(function(){
-            $('#toggle-subtask-{{ task["id"] }}').click(function() {
+            $('#toggle-subtask-{{ task["id"] }}').dblclick(function() {
               $('#toggle-row-{{ task["id"] }}').toggle();
+              $("#subtask_text_{{ task['id'] }}").focus();
             });
         });
         </script>
@@ -253,8 +249,8 @@
             <div class="form-row">
               <div class="col-2"></div>
               <div class="col-8">
-                <label class="sr-only" for="subtask_text">Subtask Text</label>
-                <input type="search" class="form-control" id="subtask_text" name="subtask_text" placeholder="Add subtask" value="{{ request.form['subtask_text'] }}" required>
+                <label class="sr-only" for="subtask_text_{{ task['id'] }}">Subtask Text</label>
+                <input type="search" class="form-control" id="subtask_text_{{ task['id'] }}" name="subtask_text_{{ task['id'] }}" placeholder="Add subtask" value="{{ request.form['subtask_text_{{ task[\'id\'] }}'] }}" required>
               </div>
               <div class="col-1 text-center my-auto">
                 <button type="submit" value="Submit" class="btn btn-custom">
